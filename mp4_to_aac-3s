@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# 检查所需工具是否已安装
+command -v ffmpeg >/dev/null 2>&1 || { echo >&2 "请先安装 ffmpeg 工具"; exit 1; }
+
+# 设置要处理的文件目录
+audio_dir="$1"
+
+# 迭代处理每个 AAC 音频文件
+for file in "$audio_dir"*.mp4; do
+    filename=$(basename "$file")
+    output_file="${audio_dir}${filename%%.*}.aac"
+
+    # 获取音频文件总时长
+    duration=$(ffprobe -i "$file" -show_entries format=duration -v quiet -of csv="p=0")
+echo $duration
+    # 计算要保留的时长（总时长减去 3 秒）
+    new_duration=$(echo "$duration-3" | bc)
+echo $new_duration
+    # 删除音频文件的最后 3 秒
+    ffmpeg -loglevel debug -y  -i "$file" -t "$new_duration" -vn -c:a copy "$output_file"
+
+    echo "已删除 $file 的最后 3 秒，并保存为 $output_file"
+done
+

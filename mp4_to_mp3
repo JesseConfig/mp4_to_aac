@@ -1,0 +1,14 @@
+
+#!/bin/bash
+
+echo $1 
+basename $1 
+
+outfilename=$(basename $1)
+
+if [ -n "$1" ];then
+ffmpeg -i "$1" -acodec libmp3lame -vn "${outfilename%%.*}.mp3"
+else
+echo error
+exit 1
+fi
