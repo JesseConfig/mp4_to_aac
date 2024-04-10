@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# 检查所需工具是否已安装
+command -v ffmpeg >/dev/null 2>&1 || { echo >&2 "请先安装 ffmpeg 工具"; exit 1; }
+
+# 设置要处理的文件目录
+audio_dir="$1"
+
+# 输出文件夹
+output_dir="$2"
+
+[ -d "$output_dir" ] || mkdir -p "$output_dir"
+
+# 迭代处理每个文件
+for file in "$audio_dir"*.mp4; do
+
+    filename=$(basename "$file")
+    output_file="${output_dir}/${filename%%.*}"
+
+	ffmpeg -loglevel quiet -y  -i "$file" -acodec copy -vn "${output_file}.aac"
+
+done
